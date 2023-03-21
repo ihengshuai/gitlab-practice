@@ -1,0 +1,17 @@
+{
+  "name": "@frontend-lib/helper",
+  "version": "0.0.7",
+  "description": "前端通用库",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rollup index.js --file dist/index.js --format umd --name helper"
+  },
+  "files": ["dist"],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dayjs": "^1.11.7",
+    "rollup": "^3.20.0"
+  }
+}

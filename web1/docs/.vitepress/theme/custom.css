@@ -1,0 +1,38 @@
+:root {
+  --vp-c-brand: #646cff;
+  --vp-c-brand-light: #747bff;
+  --vp-c-brand-dark: rgb(74, 72, 196);
+  --vp-layout-max-width: 1500px;
+  --vp-sidebar-width: 300px
+}
+
+.VPDoc.has-aside .content-container {
+  max-width: 860px !important;
+}
+
+.VPDoc:not(.has-sidebar) .content {
+  max-width: 1000px !important;
+}
+
+.aside-curtain {
+  background: transparent !important;
+}
+
+.title-text {
+  font-size: 18px !important;
+}
+.link-text {
+  font-size: 16px !important;
+}
+.link-text.light {
+  font-size: 13px !important;
+}
+
+  .sm-center {
+@media screen and (max-width: 600px) {
+    text-align: center;
+  }
+  .sm-center > * {
+    margin-bottom: 8px;
+  }
+}

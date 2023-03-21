@@ -1,0 +1,40 @@
+{
+  "name": "web1",
+  "version": "1.0.1",
+  "description": "this is a blog for sharing the knowledge of web development.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "vitepress dev docs --port=9999",
+    "build": "vitepress build docs",
+    "rlimage": "node scripts/replace-local-image.js",
+    "rc": "node scripts/replace-cdn.js"
+  },
+  "keywords": [
+    "blog",
+    "frontend",
+    "backend",
+    "vue",
+    "react",
+    "webpack"
+  ],
+  "author": {
+    "name": "ihengshuai",
+    "email": "ihengshuai@qq.com",
+    "url": "http://192.168.10.10/frontend/web1"
+  },
+  "homepage": "https://blog.usword.cn",
+  "bugs": {
+    "url": "https://github.com/ihengshuai/blog/issues"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@algolia/client-search": "^4.9.1",
+    "@types/node": "^18.11.7",
+    "dotenv": "^16.0.1",
+    "markdown-it-anchor": "^8.6.5",
+    "typescript": "^4.8.4",
+    "vitepress": "1.0.0-alpha.30",
+    "vue": "^3.2.37"
+  }
+}
+

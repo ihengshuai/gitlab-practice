@@ -1,0 +1,95 @@
+image: node:16-alpine
+
+variables:
+  IMAGE_TAG: $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+  DOCKER_REPO: 192.168.10.10:8000
+
+stages:
+ - build
+ - deploy
+ - notice
+
+build_code:
+ stage: build
+ only:
+ - main
+ - testing
+ tags:
+ - testing
+ # allow_failure: false
+ # 根据文件内容缓存 node_modules
+ cache:
+  key:
+    files:
+      - pnpm-lock.yaml
+  paths:
+    - node_modules
+ artifacts:
+    expire_in: 1 day
+    paths:
+      - dist
+ script:
+ - echo build stage
+ - sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+ - apk update && apk add git && apk add openssh-client
+ - npm config set registry http://192.168.10.10:8081/repository/npm-group/
+ - npm install pnpm -g
+ - pnpm install
+ - pnpm run build
+ - echo build success
+
+deploy:
+ stage: deploy
+ needs:
+ - build_code
+ image:
+    # https://docs.gitlab.cn/jh/ci/docker/using_kaniko.html
+    name: gcr.io/kaniko-project/executor:debug
+    # pull_policy: if_not_present
+    entrypoint: [""]
+ only:
+ - main
+ - testing
+ tags:
+ - testing
+ script:
+ - echo deploy docker image
+ - mkdir -p /kaniko/.docker
+ - echo "{\"auths\":{\"${DOCKER_REPO}\":{\"username\":\"${DOCKER_REGISTRY_USER}\",\"password\":\"${DOCKER_REGISTRY_PASSWORD}\"}}}" > /kaniko/.docker/config.json
+ # - echo "${DOCKER_AUTH_CONFIG}" > /kaniko/.docker/config.json
+ # - echo "{\"auths\":{\"$DOCKER_REPO\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+ - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "$DOCKER_REPO/$IMAGE_TAG"
+ #rules:
+ #  - exists:
+ #    - Dockerfile
+
+
+notice_success:
+ image: curlimages/curl:7.80.0
+ stage: notice
+ only:
+ - main
+ - testing
+ needs:
+ - deploy
+ when: on_success
+ script:
+ - echo notice success
+ - "curl -i -H \"Content-Type: application/json\" -X POST -d \"{code: 200, message: 构建成功}\" \"http://192.168.10.99:9999/success\""
+
+notice_failure:
+ image: curlimages/curl:7.80.0
+ stage: notice
+ only:
+ - main
+ - testing
+ needs:
+ - deploy
+ when: on_failure
+ script:
+ - echo notice failure
+#  - curl -I http:\/\/192.168.10.99:9999/success
+ - "curl -i -H \"Content-Type: application/json\" -X POST -d \"{code: 500, message: 构建失败}\" \"http://192.168.10.99:9999/failure\""

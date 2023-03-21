@@ -1,0 +1,3 @@
+*.js linguist-language=markdown
+*.tsx linguist-language=markdown
+*.html linguist-language=markdown
